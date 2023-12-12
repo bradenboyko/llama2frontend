@@ -42,10 +42,10 @@ const App = () => {
       <Topbar theme={theme} setTheme={setTheme}/>
 
       <Routes>
-        <Route path="/" exact element={<Navigate to="/chat"/>}/>
-        <Route path="/chat" exact element={<Chat/>}/>
+        <Route path="/" exact element={<Chat/>}/>
+        <Route path="/chat" exact element={<Navigate to="/"/>}/>
         <Route path="/models" exact element={<Models/>}/>
-        <Route path="*" exact element={<Navigate to="/chat"/>}/>
+        <Route path="*" exact element={<Navigate to="/"/>}/>
       </Routes>
     
     </BrowserRouter>

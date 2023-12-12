@@ -7,7 +7,7 @@ import Models from './components/Models';
 
 const App = () => {
 
-  const savedTheme = localStorage.getItem('theme') || 'light';
+  const savedTheme = localStorage.getItem('theme') || 'dark';
   const [theme, setTheme] = useState(savedTheme);
 
   useEffect(() => {

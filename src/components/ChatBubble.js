@@ -7,7 +7,7 @@ const ChatBubble = (props) => {
 
     return (
         <>
-        <div className="individual_message_container" style={{ justifyContent: messageData?.sender === "bot" ? "left" : "" }}>
+        <div className="individual_message_container" style={{ justifyContent: (messageData?.sender === "bot" || messageData?.sender === "system") ? "left" : "" }}>
 
             <div className={`individual_message_bubble ${messageData?.sender === "me" && "message_sender"}`}>
                 {messageData?.content}

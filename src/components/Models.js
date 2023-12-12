@@ -13,7 +13,7 @@ const Models = ( props ) => {
         <div className="list_container" style={{ marginTop: "10px" }}>
 
             <div className="list_bubble">
-                <div className={`bubble_title`}>Llama2</div>
+                <div className={`bubble_title`}>TheBloke/Llama-2-13B-Chat-GPTQ</div>
                 
                 <button type="button" className="checkbox_button" style={{ marginTop: "15px", marginBottom: "0px" }} disabled><i className="material-symbols-outlined inline-icon">check</i> Selected</button>
             </div>            

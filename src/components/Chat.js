@@ -7,89 +7,67 @@ import ChatBubble from "./ChatBubble";
 import '../styles.css';
 
 const Chat = ( props ) => {
-    const { user, setUser } = props;
 
     const [allMessages, setAllMessages] = useState([]);
     const messagesEndRef = useRef(null);
-
-    // sorts all messages
-    useEffect(() => {
-        let myMessages = user?.result?.messages?.map((message) => ({
-            id: message._id,
-            sender: "me",
-            content: message.content,
-            date: message.date,
-        }));
-        
-        let botMessages = user?.result?.messages?.map((message) => ({
-            id: message._id,
-            sender: "bot",
-            content: message.response,
-            date: message.date,
-        }));
-
-        let messages = [...(myMessages || []), ...(botMessages || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
-        setAllMessages(messages);
-    }, [user]);
 
     const chatInitialValues = {
         content: "",
     }
 
-    // handles chat
+    // handles chat submit
     const handleSubmit = async (values, {resetForm}) => {
         try {
+            if (values.content === "" || values.content === " ") return;
             resetForm();
 
-            // adds user message
+            // adds user's message
             const newMessage = {
-                id: Date.now(),
                 sender: "me",
                 content: values.content,
                 date: new Date().toISOString(),
             };
             setAllMessages([...allMessages, newMessage]);
 
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 500));
 
             // adds bot typing message
             const botTyping = {
-                id: 'bot-typing',
-                sender: "bot",
+                sender: "system",
                 content: "...",
                 date: new Date().toISOString(),
             };
             setAllMessages(prevMessages => [...prevMessages, botTyping]);
 
-            await new Promise((resolve) => setTimeout(resolve, 2500));
-            
+            // sends request to backend
             const response = await axios({
-                url: `https://api.runpod.ai/v2/ENDPOINT_ID`,
+                url: `${process.env.REACT_APP_BACKEND_URL}/routes/llama`,
                 method: 'POST',
                 responseType: 'json',
                 data: values,
             });
-            // chat success, update the messages array
-            console.log(response.data);
-
+            // send success
+            console.log(response);
+            
             // removes temporary bot message
-            setAllMessages(prevMessages => prevMessages.filter(message => message.id !== 'bot-typing'));
+            setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
 
             // adds bot message
             const botResponse = {
-                id: response.data.messages[response.data.messages.length - 1]._id,
                 sender: "bot",
-                content: response.data.messages[response.data.messages.length - 1].response,
-                date: response.data.messages[response.data.messages.length - 1].date,
+                content: response.data.output,
+                date: new Date().toISOString(),
             };
-            setAllMessages([...allMessages, botResponse]);
+            setAllMessages(prevMessages => [...prevMessages, botResponse]);
+
         } catch (error) {
+            console.log(error);
+            
             // removes temporary bot message
-            setAllMessages(prevMessages => prevMessages.filter(message => message.id !== 'bot-typing'));
+            setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
             const chatError = {
-                id: 'chat-error',
-                sender: "bot",
-                content: "The endpoint https://api.runpod.ai/v2/ENDPOINT_ID did not return a response.",
+                sender: "system",
+                content: "The endpoint https://api.runpod.ai/v2/d8w57gwvmcpckk did not return a response.",
                 date: new Date().toISOString(),
             };
             setAllMessages(prevMessages => [...prevMessages, chatError]);
@@ -129,7 +107,7 @@ const Chat = ( props ) => {
                 <Field name="content" type="text" className="form_chatbox" placeholder="Send a message"></Field>
                 <button type="submit" disabled={isSubmitting} className="send_message_button"><i className="material-symbols-outlined inline-icon">send</i></button><br/>
             
-                <div className="subtext" style={{ marginTop: "15px", marginBottom: "10px", fontSize: "12px", textAlign: "center" }}>Selected model: Llama2</div>
+                <div className="subtext" style={{ marginTop: "15px", marginBottom: "10px", fontSize: "12px", textAlign: "center" }}>Model: TheBloke/Llama-2-13B-Chat-GPTQ</div>
             </Form>)}}
         </Formik>
         </div>

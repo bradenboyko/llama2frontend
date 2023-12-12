@@ -14,8 +14,8 @@ const Sidebar = ( props ) => {
 
             {/*<img className="sidebar_logo" src={require(theme === "dark" ? '../images/default.png' : '../images/default.png')} alt=""/>*/}
 
-            <div className={(window.location.pathname === "/chat") ? "sidebar_item sidebar_item_active" : "sidebar_item"} style={{ marginTop: "60px" }} onClick={e => navigate(`/chat`)}>
-                <i className={`material-symbols-outlined ${(window.location.pathname === "/chat") && "icon-filled icon-color"}`}>chat_bubble</i>&nbsp;&nbsp;&nbsp;Chat
+            <div className={(window.location.pathname === "/") ? "sidebar_item sidebar_item_active" : "sidebar_item"} style={{ marginTop: "60px" }} onClick={e => navigate(`/`)}>
+                <i className={`material-symbols-outlined ${(window.location.pathname === "/") && "icon-filled icon-color"}`}>chat_bubble</i>&nbsp;&nbsp;&nbsp;Chat
             </div>
 
             <div className={(window.location.pathname === "/models") ? "sidebar_item sidebar_item_active" : "sidebar_item"} onClick={e => navigate(`/models`)}>

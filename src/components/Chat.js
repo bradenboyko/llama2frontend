@@ -46,10 +46,7 @@ const Chat = ( props ) => {
                 responseType: 'json',
                 data: values,
             });
-            // send success
-            console.log(response);
-            
-            // removes temporary bot message
+            // send success, removes temporary bot message
             setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
 
             // adds bot message

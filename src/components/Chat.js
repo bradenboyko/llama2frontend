@@ -23,11 +23,22 @@ const Chat = ( props ) => {
 
             // adds user's message
             const newMessage = {
-                sender: "me",
+                sender: "user",
                 content: values.content,
                 date: new Date().toISOString(),
             };
             setAllMessages([...allMessages, newMessage]);
+
+            // create chat history string
+            const chatHistoryString = allMessages.map(message => 
+                `${message.sender.toUpperCase()}: ${message.content}`
+            ).join('\n');
+
+            // modify the request data
+            const requestData = {
+                content: values.content,
+                chatHistory: chatHistoryString
+            };
 
             await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -44,14 +55,14 @@ const Chat = ( props ) => {
                 url: `${process.env.REACT_APP_BACKEND_URL}/routes/llama`,
                 method: 'POST',
                 responseType: 'json',
-                data: values,
+                data: requestData,
             });
             // send success, removes temporary bot message
             setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
 
             // adds bot message
             const botResponse = {
-                sender: "bot",
+                sender: "assistant",
                 content: response.data.output,
                 date: new Date().toISOString(),
             };
@@ -64,7 +75,7 @@ const Chat = ( props ) => {
             setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
             const chatError = {
                 sender: "system",
-                content: "The endpoint https://api.runpod.ai/v2/d8w57gwvmcpckk did not return a response.",
+                content: "The endpoint https://api.runpod.ai/v2/d8w57gwvmcpckk did not return a response. Runpod is waiting for GPUs to become available. Try again in an hour!",
                 date: new Date().toISOString(),
             };
             setAllMessages(prevMessages => [...prevMessages, chatError]);

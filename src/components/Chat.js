@@ -11,6 +11,25 @@ const Chat = ( props ) => {
     const [allMessages, setAllMessages] = useState([]);
     const messagesEndRef = useRef(null);
 
+    // load messages from localStorage on initial render
+    useEffect(() => {
+        const savedMessages = localStorage.getItem('chatMessages');
+        if (savedMessages) {
+            setAllMessages(JSON.parse(savedMessages));
+        }
+    }, []);
+
+    // save messages to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem('chatMessages', JSON.stringify(allMessages));
+    }, [allMessages]);
+
+    // clears chat history
+    const clearHistory = () => {
+        setAllMessages([]);
+        localStorage.removeItem('chatMessages');
+    };
+
     const chatInitialValues = {
         content: "",
     }
@@ -114,8 +133,11 @@ const Chat = ( props ) => {
                 
                 <Field name="content" type="text" className="form_chatbox" placeholder="Send a message"></Field>
                 <button type="submit" disabled={isSubmitting} className="send_message_button"><i className="material-symbols-outlined inline-icon">send</i></button><br/>
-            
-                <div className="subtext" style={{ marginTop: "15px", marginBottom: "10px", fontSize: "12px", textAlign: "center" }}>Model: TheBloke/Llama-2-13B-Chat-GPTQ</div>
+                
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div className="subtext" style={{ marginTop: "15px", marginBottom: "10px", fontSize: "12px", textAlign: "center", marginRight: "4px" }}>Model: TheBloke/Llama-2-13B-Chat-GPTQ •</div>
+                    <span className="subtext_button" onClick={clearHistory}>Clear history</span>
+                </div>
             </Form>)}}
         </Formik>
         </div>

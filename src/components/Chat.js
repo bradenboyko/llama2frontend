@@ -9,7 +9,9 @@ import '../styles.css';
 const Chat = ( props ) => {
 
     const [allMessages, setAllMessages] = useState([]);
+    const [isModelBooting, setIsModelBooting] = useState(false);
     const messagesEndRef = useRef(null);
+    const modelBootTimeoutRef = useRef(null);
 
     // load messages from localStorage on initial render
     useEffect(() => {
@@ -69,6 +71,15 @@ const Chat = ( props ) => {
             };
             setAllMessages(prevMessages => [...prevMessages, botTyping]);
 
+            // reset the model booting message state and set a timeout
+            setIsModelBooting(false);
+            clearTimeout(modelBootTimeoutRef.current);
+            modelBootTimeoutRef.current = setTimeout(() => {
+                // change the message after 15 seconds and removes typing message
+                setIsModelBooting(true);
+                setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
+            }, 15000);
+
             // sends request to backend
             const response = await axios({
                 url: `${process.env.REACT_APP_BACKEND_URL}/routes/llama`,
@@ -76,7 +87,12 @@ const Chat = ( props ) => {
                 responseType: 'json',
                 data: requestData,
             });
-            // send success, removes temporary bot message
+
+            // clear the timeout when the response is received
+            clearTimeout(modelBootTimeoutRef.current);
+            setIsModelBooting(false);
+
+            // removes temporary bot message
             setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
 
             // adds bot message
@@ -94,7 +110,7 @@ const Chat = ( props ) => {
             setAllMessages(prevMessages => prevMessages.filter(message => message.sender !== 'system'));
             const chatError = {
                 sender: "system",
-                content: "The endpoint https://api.runpod.ai/v2/d8w57gwvmcpckk did not return a response. Runpod is waiting for GPUs to become available. Try again in an hour!",
+                content: "Your request timed out. Runpod is probably waiting for GPUs to become available- please try again in an hour.",
                 date: new Date().toISOString(),
             };
             setAllMessages(prevMessages => [...prevMessages, chatError]);
@@ -120,6 +136,9 @@ const Chat = ( props ) => {
                         <ChatBubble messageData={message}/>
                     </div>
                 ))}
+                {isModelBooting && (
+                    <ChatBubble messageData={{ sender: "system", content: "Booting up the model. This could take 1-3 minutes. If it takes longer, refresh and try again.", date: new Date().toISOString()}}/>
+                )}
                 <div ref={messagesEndRef}></div>
             </div>
 
